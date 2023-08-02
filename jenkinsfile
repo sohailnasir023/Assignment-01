@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/sohailnasir023/Assignment-1.git'
+            }
+        }
+        stage('build') {
+            steps {
+                
+                sh 'python3 python.py'
+            }
+        }
+        
+        stage('SonarQube analysis') {
+            steps {
+                script {
+                   sh'/opt/sonar-scanner/bin/sonar-scanner \
+                    -Dsonar.projectKey=assignment-1b \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=http://10.0.10.124:9000 \
+                    -Dsonar.token=sqp_beccac2b54c01ad49bddc2c934c517122afbcf15 '
+                }
+            }
+        }
+        stage('Docker-image-build') {
+            steps {
+                
+                sh 'docker build -t assignment1-dockerimage '
+            }
+        }
+        
+    }
+}
